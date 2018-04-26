@@ -15,7 +15,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function sendX10($device, $action) {
+function sendX10($device, $action, $count) {
 	
 	global $ini_x10;
 
@@ -80,6 +80,16 @@ function sendX10($device, $action) {
 			return $command_dtv . "\n" . $command_tv_off . "\n" . $command_rxv_off . " Basement TV turned off";
 		}
 	}
+	else if ($device == "directv")
+	{
+		if ($action == "advanced")
+		{
+			$action = "advance";
+		}
+		$command_dtv = "python3 /home/ubuntu/dtv_keypress.py $action $count";
+		system($command_dtv);
+		return $command_dtv . " DirecTV";
+	}
 	else if (isset($ini_x10[$appliance]['code'])) {
 		
 		if (($action == "dim" || $action == "bright") && isset($ini_x10[$appliance]['dim']))
@@ -131,11 +141,24 @@ function sendX10($device, $action) {
 $install_path = '/opt/alexa';
 $x10_config = $install_path . "/etc/x10.ini";
 $ini_x10 = parse_ini_file($x10_config, true);
-$action = isset($_GET["action"]) ? $_GET["action"] : "none";
-$device = isset($_GET["device"]) ? $_GET["device"] : "none";
+$action = strtolower(isset($_GET["action"]) ? $_GET["action"] : "none");
+$device = strtolower(isset($_GET["device"]) ? $_GET["device"] : "none");
+$count = isset($_GET["count"]) ? $_GET["count"] : "1";
+if ($count == "five")
+	$count = 5;
+else if ($count == "six")
+	$count = 6;
+else if ($count == "seven")
+	$count = 7;
+else if ($count == "eight")
+	$count = 8;
+else if ($count == "nine")
+	$count = 9;
+else if ($count == "ten")
+	$count = 10;
 
 if ($action != "none" && $device != "none")
-	echo sendX10($device, $action);
+	echo sendX10($device, $action, $count);
 else
 	echo "Invalid Device and/or Action.";
 
