@@ -37,7 +37,7 @@ function sendX10($device, $action, $count) {
 			sleep(1);
 			$command3 = "python /home/ubuntu/directv.py --device \"0x2712 192.168.0.157 5c73c134ea34\" POWER";
 			system($command3);
-			return $command1 . " " . $command2 . " " . $command3 . "Projector turned on";
+			return $command1 . "\n" . $command2 . "\n" . $command3 . "\nProjector turned on";
 		}
 		else if ($action == "off")
 		{
@@ -49,9 +49,9 @@ function sendX10($device, $action, $count) {
 			sleep(1);
 			$command3 = "python /home/ubuntu/directv.py --device \"0x2712 192.168.0.157 5c73c134ea34\" POWER";
 			system($command3);
-			return $command1 . " " . $command2 . " " . $command3 . "Projector turned on";
+			return $command1 . "\n" . $command2 . "\n" . $command3 . "\nProjector turned on";
 		}
-		return "Projector : unknown action";
+		return $device . " : unknown action";
 	}
 	else if ($device == "basement_tv")
 	{
@@ -60,28 +60,32 @@ function sendX10($device, $action, $count) {
 			$command_dtv = "python3 /home/ubuntu/dtv_keypress.py poweron";
 			system($command_dtv);
 			sleep(1);
+			$command_rxv_on = "python3 /home/ubuntu/rxv/rxv.py 1";
+			system($command_rxv_on);
+			sleep(1);
+			$command_tv_off = "/home/ubuntu/bravia-auth-and-remote/send_command.sh 192.168.0.31 AAAAAQAAAAEAAAAVAw==";
+			system($command_tv_off);
+			sleep(1);
 			$command_tv_on = "/home/ubuntu/bravia-auth-and-remote/send_command.sh 192.168.0.31 AAAAAQAAAAEAAAAuAw==";
 			system($command_tv_on);
 			sleep(1);
 			$command_tv_hdmi3 = "/home/ubuntu/bravia-auth-and-remote/send_command.sh 192.168.0.31 AAAAAgAAABoAAABcAw==";
 			system($command_tv_hdmi3);
-			sleep(1);
-			$command_rxv_on = "python3 /home/ubuntu/rxv/rxv.py 1";
-			system($command_rxv_on);
-			return $command_dtv . "\n" . $command_tv_on . "\n" . $command_tv_hdmi3 . "\n" . $command_rxv_on . " Basement TV turned on";
+			return $command_dtv . "\n" . $command_tv_off . "\n" . $command_tv_on . "\n" . $command_tv_hdmi3 . "\n" . $command_rxv_on . "\nBasement TV turned on";
 		}
 		else if ($action == "off")
 		{
 			$command_dtv = "python3 /home/ubuntu/dtv_keypress.py poweroff";
 			system($command_dtv);
 			sleep(1);
-			$command_tv_off = "/home/ubuntu/bravia-auth-and-remote/send_command.sh 192.168.0.31 AAAAAQAAAAEAAAAvAw==";
-			system($command_tv_off);
-			sleep(1);
 			$command_rxv_off = "python3 /home/ubuntu/rxv/rxv.py 0";
 			system($command_rxv_off);
-			return $command_dtv . "\n" . $command_tv_off . "\n" . $command_rxv_off . " Basement TV turned off";
+			sleep(1);
+			$command_tv_off = "/home/ubuntu/bravia-auth-and-remote/send_command.sh 192.168.0.31 AAAAAQAAAAEAAAAVAw==";
+			system($command_tv_off);
+			return $command_dtv . "\n" . $command_tv_off . "\n" . $command_rxv_off . "\nBasement TV turned off";
 		}
+		return $device . " : unknown action";
 	}
 	else if ($device == "directv")
 	{
@@ -91,7 +95,7 @@ function sendX10($device, $action, $count) {
 		}
 		$command_dtv = "python3 /home/ubuntu/dtv_keypress.py $action $count";
 		system($command_dtv);
-		return $command_dtv . " DirecTV";
+		return $command_dtv . "\nDirecTV";
 	}
 	else if (isset($ini_x10[$appliance]['code'])) {
 		
@@ -132,7 +136,9 @@ function sendX10($device, $action, $count) {
 		#}
 	}
 	else
-		return "Couldn't find the appliance named " . $appliance;
+	{
+		return "Couldn't find the appliance named " . $device;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
